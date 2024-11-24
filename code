@@ -22,7 +22,7 @@ int main() {
         switch(opcao) {
             case 1: jogar(); break;
             case 2: printf("Ranking\n"); break;
-            case 3: printf("Creditos: Desenvolvido por Victor Mota, Leornardo Mendonça, Pedro Barbosa, Vitor Pimentel, Tasso Tanouss, Luan Santos de santana\n"); break;
+            case 3: printf("Creditos: Desenvolvido por Victor Mota, Leornardo Mendonça, Pedro Barbosa, Vitor Pimentel, Tasso Tanouss, Luan Santos\n"); break;
             case 4: printf("Saindo...\n"); break;
             default: printf("Opcao invalida\n");
         }
