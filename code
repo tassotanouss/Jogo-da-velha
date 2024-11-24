@@ -82,7 +82,7 @@ void jogar() {
         tabuleiro[linha][coluna] = jogador;
         
         if (verificarVitoria(tabuleiro, jogador)) {
-            printf("Jogador %c vence!!!\n", jogador);
+            printf("Jogador %c vence!\n", jogador);
             return;
         }
 
