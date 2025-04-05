@@ -1,0 +1,176 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyNGP6hF+RiaaO9IfKMq4Xp5",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/tassotanouss/Jogo-da-velha/blob/main/Hackathon_Q2.\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 23,
+      "metadata": {
+        "id": "nHSrZCyKPian"
+      },
+      "outputs": [],
+      "source": [
+        "import numpy as np # gerar matrizes e vetores para grandes volumes\n",
+        "import pandas as pd # é uma planilha\n",
+        "from sklearn.datasets import make_classification # dataset para auxiliar na criação dos dados do cartão de crédito\n",
+        "\n",
+        "from sklearn.model_selection import train_test_split # separa a base de dados em 70% treino e 30% teste\n",
+        "from sklearn.preprocessing import StandardScaler # preprocessamento dados normalização\n",
+        "from sklearn.ensemble import RandomForestClassifier\n",
+        "from sklearn.metrics import classification_report"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "total_samples = 10000\n",
+        "fraud_ratio = 0.05\n",
+        "fraud_samples = int(total_samples * fraud_ratio)\n",
+        "normal_samples = total_samples - fraud_samples"
+      ],
+      "metadata": {
+        "id": "BBeCOkCKQ-vA"
+      },
+      "execution_count": 24,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "x,y = make_classification(n_samples=total_samples, n_features=5, weights=[0.95, 0.05], random_state=42)"
+      ],
+      "metadata": {
+        "id": "b2YUglQzRgAT"
+      },
+      "execution_count": 25,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = pd.DataFrame(x, columns=['valor_transacao', 'latitude', 'longitude', 'historico_usuario', 'horario_compra',])\n",
+        "df['fraude'] = y"
+      ],
+      "metadata": {
+        "id": "GDO1-vDrR9fo"
+      },
+      "execution_count": 36,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "def ajustar_valores(df):\n",
+        "  df['valor_transacao'] = np.abs(df['valor_transacao']) *1000\n",
+        "  df['latitude'] = np.round(np.random.uniform(-90,90,total_samples), 6)\n",
+        "  df['longitude'] = np.round(np.random.uniform(-180,180,total_samples), 6)\n",
+        "  df['historico_usuario'] = np.random.randint(1,50,total_samples)\n",
+        "  df['horario_compra'] = np.random.randint(0,24,total_samples)\n",
+        "  return df"
+      ],
+      "metadata": {
+        "id": "3NXUW4dZStt8"
+      },
+      "execution_count": 37,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df = ajustar_valores(df)"
+      ],
+      "metadata": {
+        "id": "JS_g8L2PVQB9"
+      },
+      "execution_count": 38,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df.to_csv('fraude')"
+      ],
+      "metadata": {
+        "id": "oCQwU5bqVbBu"
+      },
+      "execution_count": 39,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import joblib"
+      ],
+      "metadata": {
+        "id": "2ekZm05bXPTq"
+      },
+      "execution_count": 40,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "# prompt: gere o codigo para salvar o modelo no formato pkl\n",
+        "\n",
+        "import numpy as np # gerar matrizes e vetores para grandes volumes\n",
+        "import pandas as pd # é uma planilha\n",
+        "from sklearn.datasets import make_classification # dataset para auxiliar na criação dos dados do cartão de crédito\n",
+        "from sklearn.model_selection import train_test_split # separa a base de dados em 70% treino e 30% teste\n",
+        "from sklearn.preprocessing import StandardScaler # preprocessamento dados normalização\n",
+        "from sklearn.ensemble import RandomForestClassifier\n",
+        "from sklearn.metrics import classification_report\n",
+        "import joblib\n",
+        "\n",
+        "# ... (your existing code) ...\n",
+        "\n",
+        "# Assuming 'X' and 'y' are your features and target variable\n",
+        "X = df.drop('fraude', axis=1)\n",
+        "y = df['fraude']\n",
+        "\n",
+        "X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)\n",
+        "\n",
+        "scaler = StandardScaler()\n",
+        "X_train = scaler.fit_transform(X_train)\n",
+        "X_test = scaler.transform(X_test)\n",
+        "\n",
+        "model = RandomForestClassifier(random_state=42)\n",
+        "model.fit(X_train, y_train)\n",
+        "\n",
+        "y_pred = model.predict(X_test)\n",
+        "print(classification_report(y_test, y_pred))\n",
+        "\n",
+        "# Save the model\n",
+        "joblib.dump(model, 'fraud_detection_model.pkl')\n"
+      ],
+      "metadata": {
+        "id": "dfb-XOu8XSlh"
+      },
+      "execution_count": null,
+      "outputs": []
+    }
+  ]
+}
